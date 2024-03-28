@@ -1,17 +1,20 @@
 {
   "private": true,
   "scripts": {
-    "dev": "node server.js",
+    "dev": "nodemon server.js",
     "build": "next build",
     "start": "cross-env NODE_ENV=production node server.js"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
     "next": "latest",
+    "nodemon": "^3.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "reactstrap": "^8.9.0"
+    "reactstrap": "^8.9.0",
+    "uuid": "^9.0.1"
   },
   "license": "MIT"
 }
