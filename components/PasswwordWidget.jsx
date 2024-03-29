@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-const InputWidget = ({ config }) => {
+const PasswwordWidget = ({ config }) => {
     const { type, name, label, regex, required, conditions } = config
     const id = uuidv4().substring(0, 7)
 
@@ -20,10 +20,10 @@ const InputWidget = ({ config }) => {
                 pattern={regex}
                 required={required}
                 placeholder={label}
-                type="text"
+                type="password"
             />
         </FormGroup>
     )
 }
 
-export default InputWidget
+export default PasswwordWidget
