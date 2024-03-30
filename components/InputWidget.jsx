@@ -1,29 +1,57 @@
-import React from 'react'
-import { FormGroup, Input, Label } from 'reactstrap'
+import React, { useState } from 'react';
+import { FormGroup, Input, Label } from 'reactstrap';
 import { v4 as uuidv4 } from 'uuid';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-
 
 const InputWidget = ({ config }) => {
-    const { type, name, label, regex, required, conditions } = config
-    const id = uuidv4().substring(0, 7)
+    const { type, name, label, regex, required, conditions } = config;
+    const id = uuidv4().substring(0, 7);
+    const [error, setError] = useState(null);
+    const [requiredField, setRequiredField] = useState(null);
+
+
+    const handleChange = (e) => {
+        const value = e.target.value;
+        const isValid = e.target.validity.valid
+
+        if (value === '' && !required) {
+            setError(null);
+            e.target.className = '';
+            setRequiredField(null)
+            return;
+        } else if (value === '' && required) {
+            setError(true);
+            setRequiredField(true)
+            return;
+        }
+
+        if (!isValid) {
+            setError(true)
+        } else {
+            setRequiredField(false)
+            setError(false)
+        }
+    }
+
+
 
     return (
         <FormGroup>
-            <Label for={id}>
-                {label}
-            </Label>
+            <Label for={id}>{label}</Label>
             <Input
                 id={id}
                 name={name}
+                type={type}
                 pattern={regex}
                 required={required}
                 placeholder={label}
-                type="text"
+                onChange={handleChange}
+                className={(error && "is-invalid") || (!error && error != null && "is-valid")}
             />
-        </FormGroup>
-    )
-}
+            {error && <p className="invalid-feedback">El formato es invalido</p>}
+            {requiredField && <p className="invalid-feedback">El campo es obligatorio</p>}
 
-export default InputWidget
+        </FormGroup>
+    );
+};
+
+export default InputWidget;

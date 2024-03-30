@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Form, FormGroup, Input, Label, Spinner } from "reactstrap";
+import { Form } from "reactstrap";
 import InputWidget from "../components/InputWidget";
 import { ComponentTypes } from "../utils/componentsTypes";
 import PasswwordWidget from "../components/PasswwordWidget";
-import { v4 as uuidv4 } from 'uuid';
 import CheckboxWidget from "../components/CheckboxWidget";
+import ButtonWidget from "../components/ButtonWidget";
+import SelectWidget from "../components/SelectWidget";
 
 export default function Page() {
   const [pageConfig, setPageConfig] = useState(null);
@@ -39,6 +40,10 @@ export default function Page() {
         return <PasswwordWidget config={widgetData} />;
       case ComponentTypes.CHECKBOX:
         return <CheckboxWidget config={widgetData} />;
+      case ComponentTypes.BUTTON:
+        return <ButtonWidget config={widgetData} />;
+      case ComponentTypes.SELECT:
+        return <SelectWidget config={widgetData} />;
       default:
         return <div>Error 404: Page not found</div>;
     }
@@ -50,8 +55,9 @@ export default function Page() {
 
   return (
     <>
-      <div style={{ width: '50%', margin: '0 auto' }}>
+      <div style={{ width: '50%', margin: '0 auto', padding: '20px' }}>
 
+        <h1>{pageConfig ? pageConfig.title : ""}</h1>
         <Form>
 
           {pageConfig?.inputs.map((input) => {

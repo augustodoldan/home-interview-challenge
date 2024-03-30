@@ -5,18 +5,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-const CheckboxWidget = ({ config }) => {
+const ButtonWidget = ({ config }) => {
 
-    const { type, name, label, active } = config
+    const { type, name, label, deactivated } = config
     const id = uuidv4().substring(0, 7)
 
     return (
         <div>
-            <Button color="primary" disabled={!active}>
+            <Button color="primary" disabled={deactivated}>
                 {label}
             </Button>
         </div>
     )
 }
 
-export default CheckboxWidget
+export default ButtonWidget
