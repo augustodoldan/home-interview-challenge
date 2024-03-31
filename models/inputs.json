@@ -28,8 +28,9 @@
       },
       {
         "type": "link",
-        "target": "https://digiventures.la/",
-        "text": "¿Any problem? Contact us"
+        "to": "https://digiventures.la/",
+        "target": "_newblank",
+        "label": "¿Any problem? Contact us"
       }
     ]
   },
@@ -42,7 +43,6 @@
         "label": "Your full name",
         "regex": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
       },
-
       {
         "type": "email",
         "name": "email",
@@ -67,7 +67,12 @@
         "label": "Confirm your password",
         "regex": "^(?=.*d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
         "conditions": {
-          "validations": [{ "comparision": "same", "input": "password" }]
+          "validations": [
+            {
+              "comparision": "same",
+              "input": "password"
+            }
+          ]
         }
       },
       {
@@ -75,8 +80,14 @@
         "name": "country",
         "label": "¿Where are you living?",
         "options": [
-          { "value": "argentina", "label": "Argentina" },
-          { "value": "other", "label": "Other" }
+          {
+            "value": "argentina",
+            "label": "Argentina"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
         ]
       },
       {
@@ -88,7 +99,9 @@
             {
               "comparision": "not_includes",
               "input": "country",
-              "values": ["argentina"]
+              "values": [
+                "argentina"
+              ]
             }
           ],
           "render": [
@@ -96,7 +109,9 @@
               {
                 "comparision": "includes",
                 "input": "country",
-                "values": ["other"]
+                "values": [
+                  "other"
+                ]
               }
             ]
           ]

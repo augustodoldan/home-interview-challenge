@@ -5,5 +5,6 @@ export const ComponentTypes = {
     BUTTON: "button",
     SELECT: "select",
     LINK: "link",
-    CHECKBOX: "checkbox"
+    CHECKBOX: "checkbox",
+    EMAIL: "email"
 };
