@@ -13,12 +13,13 @@ import { v4 as uuidv4 } from 'uuid';
 export default function Page() {
   const [pageConfig, setPageConfig] = useState(null);
   const [dataForm, setDataForm] = useState([])
+  const [formIsValid, setFormIsValid] = useState(false);
   const router = useRouter();
   const { path } = router.query;
 
 
 
-  const addData = (data) => {
+  const updateFormData = (data) => {
 
     setDataForm((prevDataForm) => {
 
@@ -33,16 +34,19 @@ export default function Page() {
   const renderPageComponents = (widgetData) => {
     switch (widgetData.type) {
       case ComponentTypes.TEXT:
+      case ComponentTypes.EMAIL:
+        return <InputWidget config={widgetData} updateFormData={updateFormData} />;
+
       case ComponentTypes.PASSWORD:
       case ComponentTypes.CONFIRM_PASSWORD:
-      case ComponentTypes.EMAIL:
-        return <InputWidget config={widgetData} addData={addData} />;
+        return <PasswwordWidget config={widgetData} updateFormData={updateFormData} />;
+
       case ComponentTypes.CHECKBOX:
-        return <CheckboxWidget config={widgetData} />;
+        return <CheckboxWidget config={widgetData} updateFormData={updateFormData} />;
       case ComponentTypes.BUTTON:
         return <ButtonWidget config={widgetData} />;
       case ComponentTypes.SELECT:
-        return <SelectWidget config={widgetData} addData={addData} />;
+        return <SelectWidget config={widgetData} updateFormData={updateFormData} />;
       case ComponentTypes.LINK:
         return <LinkWidget config={widgetData} />;
       default:
@@ -68,6 +72,13 @@ export default function Page() {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    const isFormValid = dataForm.every((field) => field.validated);
+    setFormIsValid(isFormValid);
+  }, [dataForm]);
+
+
   useEffect(() => {
     getData();
   }, [path]);
@@ -83,6 +94,7 @@ export default function Page() {
           })}
 
         </Form>
+        {JSON.stringify(dataForm)}
       </div>
     </>
   );
