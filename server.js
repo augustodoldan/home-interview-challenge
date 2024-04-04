@@ -1,5 +1,6 @@
 const express = require("express");
 const next = require("next");
+const bodyParser = require('body-parser');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
@@ -7,7 +8,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 //Configuration requires
-const ConfigurationModel = require("./models/inputs.json");
+const ConfigurationModel = require("./models/configuration");
 const ConfigurationService = require("./services/ConfigurationService");
 const ConfigurationController = require("./controllers/ConfigurationController");
 
@@ -22,12 +23,15 @@ const ConfigurationControllerInstance = new ConfigurationController(
 
 app.prepare().then(() => {
   const server = express();
-
+  server.use(bodyParser.json())
   //get configuration by path
   server.get("/configuration/:path", (req, res) =>
     ConfigurationControllerInstance.get(req, res)
   );
 
+  server.post("/configuration", (req, res) =>
+    ConfigurationControllerInstance.insertConfiguration(req, res)
+  );
   server.post("/:path", (req, res) => {
     console.log(req.body);
 

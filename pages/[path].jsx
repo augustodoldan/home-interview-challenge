@@ -9,6 +9,7 @@ import ButtonWidget from "../components/ButtonWidget";
 import SelectWidget from "../components/SelectWidget";
 import LinkWidget from "../components/LinkWidget";
 import { v4 as uuidv4 } from 'uuid';
+import { validator } from "../utils/validator";
 
 export default function Page() {
   const [pageConfig, setPageConfig] = useState(null);
@@ -27,9 +28,35 @@ export default function Page() {
       result.push(data)
       return [...result]
     })
-
-
   }
+
+  const processWidget = (input) => {
+    const isInDataForm = dataForm.find((element) => element.id === input.id)
+
+    if (input?.conditions?.render?.[0]?.[0].comparision === "includes") {
+
+      let propertyToSearch = input?.conditions?.render?.[0]?.[0].input
+      let valueToSearch = input?.conditions?.render?.[0]?.[0].values[0]
+
+      const found_value = validator.includes(dataForm, propertyToSearch, valueToSearch)
+
+      if (found_value) {
+        setDataForm((prevState) => [...prevState, { [inp.name]: "", validated: false, type: inp.type, id, required: element.required }])
+
+        return renderPageComponents(input);
+      } else if (isInDataForm) {
+        setDataForm((prevDataForm) => {
+
+          const result = prevDataForm.filter((element) => element.id !== input.id)
+
+          return [...result]
+        })
+      }
+    } else {
+      return renderPageComponents(input);
+    }
+  }
+
 
   const renderPageComponents = (widgetData) => {
     switch (widgetData.type) {
@@ -43,17 +70,20 @@ export default function Page() {
 
       case ComponentTypes.CHECKBOX:
         return <CheckboxWidget config={widgetData} updateFormData={updateFormData} />;
+
       case ComponentTypes.BUTTON:
-        return <ButtonWidget config={widgetData} />;
+        return <ButtonWidget config={widgetData} disabled={!formIsValid} />;
+
       case ComponentTypes.SELECT:
         return <SelectWidget config={widgetData} updateFormData={updateFormData} />;
+
       case ComponentTypes.LINK:
         return <LinkWidget config={widgetData} />;
+
       default:
         return <div>Error 404: Page not found</div>;
     }
   };
-
 
   const getData = async () => {
 
@@ -65,6 +95,9 @@ export default function Page() {
       const { data } = await response.json();
       const processed_data = data.inputs.map((element) => {
         const id = uuidv4().substring(0, 7);
+        if (element.name && !element?.conditions?.render) {
+          setDataForm((prevState) => [...prevState, { [element.name]: "", validated: false, type: element.type, id, required: element.required }])
+        }
         return { ...element, id }
       })
       setPageConfig({ ...data, inputs: processed_data });
@@ -74,7 +107,11 @@ export default function Page() {
   };
 
   useEffect(() => {
-    const isFormValid = dataForm.every((field) => field.validated);
+    const isFormValid = dataForm.every((field, index) => {
+      console.log(field)
+      return field.validated === true
+
+    });
     setFormIsValid(isFormValid);
   }, [dataForm]);
 
@@ -90,11 +127,14 @@ export default function Page() {
         <h1>{pageConfig ? pageConfig.title : ""}</h1>
         <Form >
           {pageConfig?.inputs.map((input) => {
-            return renderPageComponents(input)
+            return processWidget(input)
           })}
 
         </Form>
         {JSON.stringify(dataForm)}
+        <p>form is valids</p>
+        {JSON.stringify(formIsValid)}
+
       </div>
     </>
   );

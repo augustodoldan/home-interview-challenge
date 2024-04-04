@@ -5,14 +5,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-const ButtonWidget = ({ config }) => {
+const ButtonWidget = ({ config, disabled }) => {
 
-    const { type, name, label, deactivated } = config
+    const { type, name, label } = config
     const id = uuidv4().substring(0, 7)
 
     return (
         <div>
-            <Button color="primary" disabled={deactivated}>
+            <Button color="primary" disabled={disabled}>
                 {label}
             </Button>
         </div>

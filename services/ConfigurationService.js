@@ -4,9 +4,24 @@ class ConfigurationService {
   }
 
   //id = path name
-  getById(id) {
-    const configuration = {};
-    return configuration;
+  async getById(id) {
+    try {
+      const configuration = await this.model.find({ id });
+      return configuration;
+    } catch (error) {
+      console.error('Error al obtener configuración:', error);
+      throw error;
+    }
+  }
+
+  async insertConfiguration(configuration) {
+    try {
+      const newConfiguration = await this.model.create(configuration);
+      return newConfiguration;
+    } catch (error) {
+      console.error('Error al obtener configuración:', error);
+      throw error;
+    }
   }
 }
 
