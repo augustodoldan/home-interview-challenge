@@ -1,7 +1,7 @@
 const express = require("express");
 const next = require("next");
 const bodyParser = require('body-parser');
-
+const cors = require('cors');
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -24,6 +24,8 @@ const ConfigurationControllerInstance = new ConfigurationController(
 app.prepare().then(() => {
   const server = express();
   server.use(bodyParser.json())
+  server.use(cors());
+
   //get configuration by path
   server.get("/configuration/:path", (req, res) =>
     ConfigurationControllerInstance.get(req, res)
