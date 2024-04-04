@@ -6,7 +6,7 @@ class ConfigurationService {
   //id = path name
   async getById(id) {
     try {
-      const configuration = await this.model.find({ id });
+      const configuration = await this.model.find({ path: id });
       return configuration;
     } catch (error) {
       console.error('Error al obtener configuración:', error);

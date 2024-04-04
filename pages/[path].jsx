@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Form } from "reactstrap";
+import { Form, Spinner } from "reactstrap";
 import InputWidget from "../components/InputWidget";
 import { ComponentTypes } from "../utils/componentsTypes";
 import PasswwordWidget from "../components/PasswwordWidget";
@@ -10,14 +10,16 @@ import SelectWidget from "../components/SelectWidget";
 import LinkWidget from "../components/LinkWidget";
 import { v4 as uuidv4 } from 'uuid';
 import { validator } from "../utils/validator";
+import axios from "axios";
 
 export default function Page() {
   const [pageConfig, setPageConfig] = useState(null);
   const [dataForm, setDataForm] = useState([])
   const [formIsValid, setFormIsValid] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
   const router = useRouter();
   const { path } = router.query;
-
 
 
   const updateFormData = (data) => {
@@ -41,14 +43,11 @@ export default function Page() {
       const found_value = validator.includes(dataForm, propertyToSearch, valueToSearch)
 
       if (found_value) {
-        setDataForm((prevState) => [...prevState, { [inp.name]: "", validated: false, type: inp.type, id, required: element.required }])
 
         return renderPageComponents(input);
       } else if (isInDataForm) {
         setDataForm((prevDataForm) => {
-
           const result = prevDataForm.filter((element) => element.id !== input.id)
-
           return [...result]
         })
       }
@@ -62,17 +61,17 @@ export default function Page() {
     switch (widgetData.type) {
       case ComponentTypes.TEXT:
       case ComponentTypes.EMAIL:
-        return <InputWidget config={widgetData} updateFormData={updateFormData} />;
+        return <InputWidget config={widgetData} updateFormData={updateFormData} dataForm={dataForm} />;
 
       case ComponentTypes.PASSWORD:
       case ComponentTypes.CONFIRM_PASSWORD:
-        return <PasswwordWidget config={widgetData} updateFormData={updateFormData} />;
+        return <PasswwordWidget config={widgetData} updateFormData={updateFormData} dataForm={dataForm} />;
 
       case ComponentTypes.CHECKBOX:
         return <CheckboxWidget config={widgetData} updateFormData={updateFormData} />;
 
       case ComponentTypes.BUTTON:
-        return <ButtonWidget config={widgetData} disabled={!formIsValid} />;
+        return <ButtonWidget config={widgetData} disabled={!formIsValid} path={path} dataForm={dataForm} />;
 
       case ComponentTypes.SELECT:
         return <SelectWidget config={widgetData} updateFormData={updateFormData} />;
@@ -81,18 +80,26 @@ export default function Page() {
         return <LinkWidget config={widgetData} />;
 
       default:
-        return <div>Error 404: Page not found</div>;
+        return <div>Este componente no se puede mostrar.</div>;
     }
   };
+
+
+
+
 
   const getData = async () => {
 
     try {
-      const response = await fetch(`/configuration/${path}`);
+      setLoading(true)
+      const response = await axios.get(`/configuration/${path}`);
       if (response.status != 200) {
         throw new Error("response.message")
       }
-      const { data } = await response.json();
+      setError(false)
+      setLoading(false)
+
+      const data = response.data.data[0];
       const processed_data = data.inputs.map((element) => {
         const id = uuidv4().substring(0, 7);
         if (element.name && !element?.conditions?.render) {
@@ -102,19 +109,18 @@ export default function Page() {
       })
       setPageConfig({ ...data, inputs: processed_data });
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setLoading(false)
+      setError(true)
     }
   };
 
   useEffect(() => {
     const isFormValid = dataForm.every((field, index) => {
-      console.log(field)
       return field.validated === true
 
     });
     setFormIsValid(isFormValid);
   }, [dataForm]);
-
 
   useEffect(() => {
     getData();
@@ -122,20 +128,34 @@ export default function Page() {
 
   return (
     <>
-      <div style={{ width: '50%', margin: '0 auto', padding: '20px' }}>
+      {error ? <div style={{ display: 'flex', flexDirection: "column", justifyContent: 'center', alignItems: 'center', padding: 50 }}>
+        <h1>404</h1>
+        <h4>Ha ocurrido un error</h4>
 
-        <h1>{pageConfig ? pageConfig.title : ""}</h1>
-        <Form >
-          {pageConfig?.inputs.map((input) => {
-            return processWidget(input)
-          })}
+      </div> :
+        <div style={{ width: '60%', margin: '0 auto', marginTop: '40px', padding: '20px', border: '1px solid black' }}>
 
-        </Form>
-        {JSON.stringify(dataForm)}
-        <p>form is valids</p>
-        {JSON.stringify(formIsValid)}
+          <h1>{pageConfig ? pageConfig.title : ""}</h1>
+          <Form>
+            {pageConfig?.inputs.map((input) => {
+              return processWidget(input)
+            })}
+          </Form>
 
-      </div>
+        </div >}
+      {
+        loading &&
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Spinner
+            className="m-9"
+            color="dark"
+            type="grow"
+          >
+            Loading...
+          </Spinner>
+        </div>
+      }
+
     </>
   );
 }

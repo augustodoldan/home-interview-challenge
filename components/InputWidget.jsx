@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FormGroup, Input, Label } from 'reactstrap';
-import { v4 as uuidv4 } from 'uuid';
 
-const InputWidget = ({ config, updateFormData }) => {
+import { validator } from "../utils/validator";
+
+const InputWidget = ({ config, updateFormData, dataForm }) => {
     const { type, name, label, regex, required, conditions, id } = config;
     const [error, setError] = useState(null);
     const [requiredField, setRequiredField] = useState(null);
@@ -23,6 +24,25 @@ const InputWidget = ({ config, updateFormData }) => {
             updateFormData({ [name]: "", validated: false, type: type, id, required });
             return;
         }
+
+
+
+        if (conditions && conditions.validations) {
+            for (const validation of conditions.validations) {
+                if (validation.comparision === 'not_includes') {
+                    const input = validation?.input;
+                    const values = validation?.values;
+                    const isIncluded = validator.notIncludes(dataForm, input, values);
+                    if (!isIncluded) {
+                        setError(false);
+                    } else {
+                        setError(true);
+                        break;
+                    }
+                }
+            }
+        }
+
 
         if (!isValid) {
             setError(true)

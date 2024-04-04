@@ -32,44 +32,22 @@ class ConfigurationController {
 
   async get(req, res) {
 
-    /*     try {
-          const route = req.params.path;
-          const configuration = await this.configurationService.getById(route);
-    
-          if (configuration) {
-            res.status(200).send({ data: configuration });
-          } else {
-            res.status(404).send({ error: 'Ruta no encontrada' });
-          }
-        } catch (error) {
-          console.error('Error al obtener configuración:', error);
-          res.status(500).send({ error: 'Error interno del servidor' });
-        }
-     */
-
-
     try {
       const route = req.params.path;
-      console.log(route);
+      const configuration = await this.configurationService.getById(route);
 
-      let data = null;
-      //@TODO AUGUSTO: VER DE HACER UN WHILE PARA BÚSQUEDA PARA NO CORTAR EL BUCLE CON BREAK
-      for (const property in db_simulated) {
-        if (property === route) {
-          data = db_simulated[route];
-          break;
-        }
-      }
-
-      if (data) {
-        res.status(200).send({ data });
+      if (configuration.length > 0) {
+        res.status(200).send({ data: configuration });
       } else {
-        throw new Error("Ruta no encontrada");
+        res.status(404).send({ error: 'Ruta no encontrada' });
       }
     } catch (error) {
-      res.status(404).send({ error: error.message });
-
+      console.error('Error al obtener configuración:', error);
+      res.status(500).send({ error: 'Error interno del servidor' });
     }
+
+
+
   }
 }
 
